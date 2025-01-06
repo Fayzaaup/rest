@@ -42,7 +42,26 @@ app.get("/api/downloader/tiktok", async (req, res) => {
   }
 });
 
+app.get('/api/orkut/createpayment', async (req, res) => {
+    const { amount, codeqr } = req.query;
+    if (!amount) {
+        return res.status(400).json({ status: false, message: "Isi parameter 'amount'." });
+    }
+    if (!codeqr) {
+        return res.status(400).json({ status: false, message: "Isi parameter 'codeqr' menggunakan QRIS code kalian." });
+    }
 
+    try {
+        const response = await fetch(`https://rafaelxd.tech/api/orkut/createpayment?apikey=rafael&amount=${amount}&codeqr=${codeqr}`);
+        if (!response.ok) {
+            throw new Error(`Error dari API eksternal: ${response.statusText}`);
+        }
+        const qrData = await response.json();
+        res.json({ status: true, creator: "Rafael", result: qrData.result });
+    } catch (error) {
+        res.status(500).json({ status: false, message: error.message });
+    }
+});
 
 app.get("/api/tools/translate", async (req, res) => {
   const { text } = req.query;
