@@ -63,6 +63,59 @@ app.get('/api/orkut/createpayment', async (req, res) => {
     }
 });
 
+app.get("/api/mutasi", async (req, res) => {
+    const { apikey, merchant, keyorkut } = req.query;
+
+    // Validasi parameter
+    if (!apikey || !merchant || !keyorkut) {
+        return res.status(400).json({
+            status: false,
+            creator: "HexaNeuro",
+            message: "Parameter 'apikey', 'merchant', dan 'keyorkut' wajib diisi."
+        });
+    }
+
+    const url = `https://rafaelxd.tech/api/orkut/cekstatus?apikey=${apikey}&merchant=${merchant}&keyorkut=${keyorkut}`;
+
+    try {
+        const response = await axios.get(url);
+        const transaksi = response.data;
+
+        if (transaksi.date) {
+            // Respon jika data transaksi ditemukan
+            res.json({
+                status: true,
+                creator: "HexaNeuro",
+                result: {
+                    date: transaksi.date,
+                    amount: transaksi.amount,
+                    type: transaksi.type,
+                    qris: transaksi.qris,
+                    brand_name: transaksi.brand_name,
+                    issuer_reff: transaksi.issuer_reff,
+                    buyer_reff: transaksi.buyer_reff,
+                    balance: transaksi.balance
+                }
+            });
+        } else {
+            // Respon jika data transaksi tidak valid
+            res.status(404).json({
+                status: false,
+                creator: "HexaNeuro",
+                message: "Data transaksi tidak ditemukan atau tidak valid."
+            });
+        }
+    } catch (error) {
+        // Penanganan error jika API eksternal gagal
+        console.error("Error saat mengecek mutasi transaksi:", error.message);
+        res.status(500).json({
+            status: false,
+            creator: "HexaNeuro",
+            message: "Terjadi kesalahan saat menghubungi API eksternal. Silakan coba lagi nanti."
+        });
+    }
+});
+
 app.get("/api/tools/translate", async (req, res) => {
   const { text } = req.query;
   if (!text) return res.status(400).json({ error: "Text is required." });
