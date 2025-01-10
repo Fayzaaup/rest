@@ -76,26 +76,31 @@ app.get('/api/orkut/cekstatus', async (req, res) => {
     }
 
     try {
-        const url = `https://rafaelxd.tech/api/orkut/cekstatus?apikey=rafael&merchant=${merchant}&keyorkut=${keyorkut}`;
+        // Endpoint eksternal
+        const url = `https://api.simplebot.my.id/api/orkut/cekstatus?apikey=&merchant=${merchant}&keyorkut=${keyorkut}`;
         const response = await fetch(url);
 
+        // Jika ada masalah pada API eksternal
         if (!response.ok) {
             throw new Error(`Error dari API eksternal: ${response.statusText}`);
         }
 
         const data = await response.json();
 
-        // Respon sukses
-        if (data.status && data.result) {
+        // Struktur respon API
+        if (data.date) {
             res.json({
                 status: true,
                 creator: "HexaNeuro",
-                transaction: {
-                    date: data.result.date || "Tidak tersedia",
-                    amount: data.result.amount || "Tidak tersedia",
-                    type: data.result.type || "Tidak tersedia",
-                    qris: data.result.qris || "Tidak tersedia",
-                    balance: data.result.balance || "Tidak tersedia",
+                result: {
+                    tanggal: data.date,
+                    nominal: data.amount,
+                    jenis: data.type,
+                    qris: data.qris,
+                    nama_brand: data.brand_name,
+                    issuer_reff: data.issuer_reff,
+                    buyer_reff: data.buyer_reff,
+                    saldo: data.balance,
                 }
             });
         } else {
