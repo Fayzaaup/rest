@@ -63,55 +63,53 @@ app.get('/api/orkut/createpayment', async (req, res) => {
     }
 });
 
-app.get("/api/orkut/cekstatus", async (req, res) => {
-    const { apikey, merchant, keyorkut } = req.query;
+app.get('/api/orkut/cekstatus', async (req, res) => {
+    const { merchant, keyorkut } = req.query;
 
     // Validasi parameter
-    if (!apikey || !merchant || !keyorkut) {
+    if (!merchant || !keyorkut) {
         return res.status(400).json({
             status: false,
             creator: "HexaNeuro",
-            message: "Parameter 'apikey', 'merchant', dan 'keyorkut' wajib diisi."
+            message: "Isi parameter 'merchant' dan 'keyorkut' dengan benar."
         });
     }
 
-    const url = `https://rafaelxd.tech/api/orkut/cekstatus?apikey=${apikey}&merchant=${merchant}&keyorkut=${keyorkut}`;
-
     try {
-        const response = await axios.get(url);
-        const transaksi = response.data;
+        const url = `https://rafaelxd.tech/api/orkut/cekstatus?apikey=rafael&merchant=${merchant}&keyorkut=${keyorkut}`;
+        const response = await fetch(url);
 
-        if (transaksi.date) {
-            // Respon jika data transaksi ditemukan
+        if (!response.ok) {
+            throw new Error(`Error dari API eksternal: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        // Respon sukses
+        if (data.status && data.result) {
             res.json({
                 status: true,
                 creator: "HexaNeuro",
-                result: {
-                    date: transaksi.date,
-                    amount: transaksi.amount,
-                    type: transaksi.type,
-                    qris: transaksi.qris,
-                    brand_name: transaksi.brand_name,
-                    issuer_reff: transaksi.issuer_reff,
-                    buyer_reff: transaksi.buyer_reff,
-                    balance: transaksi.balance
+                transaction: {
+                    date: data.result.date || "Tidak tersedia",
+                    amount: data.result.amount || "Tidak tersedia",
+                    type: data.result.type || "Tidak tersedia",
+                    qris: data.result.qris || "Tidak tersedia",
+                    balance: data.result.balance || "Tidak tersedia",
                 }
             });
         } else {
-            // Respon jika data transaksi tidak valid
-            res.status(404).json({
+            res.status(500).json({
                 status: false,
                 creator: "HexaNeuro",
-                message: "Data transaksi tidak ditemukan atau tidak valid."
+                message: "Respon tidak valid dari API eksternal."
             });
         }
     } catch (error) {
-        // Penanganan error jika API eksternal gagal
-        console.error("Error saat mengecek mutasi transaksi:", error.message);
         res.status(500).json({
             status: false,
             creator: "HexaNeuro",
-            message: "Terjadi kesalahan saat menghubungi API eksternal. Silakan coba lagi nanti."
+            message: error.message
         });
     }
 });
