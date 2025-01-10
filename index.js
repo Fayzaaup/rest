@@ -57,13 +57,13 @@ app.get('/api/orkut/createpayment', async (req, res) => {
             throw new Error(`Error dari API eksternal: ${response.statusText}`);
         }
         const qrData = await response.json();
-        res.json({ status: true, creator: "Rafael", result: qrData.result });
+        res.json({ status: true, creator: "HexaNeuro", result: qrData.result });
     } catch (error) {
         res.status(500).json({ status: false, message: error.message });
     }
 });
 
-app.get("/api/mutasi", async (req, res) => {
+app.get("/api/orkut/cekstatus", async (req, res) => {
     const { apikey, merchant, keyorkut } = req.query;
 
     // Validasi parameter
