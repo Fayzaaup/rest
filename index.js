@@ -65,38 +65,25 @@ app.get('/api/orkut/createpayment', async (req, res) => {
 
 app.get('/api/orkut/cekstatus', async (req, res) => {
     const { merchant, keyorkut } = req.query;
-
-    if (!merchant) {
-        return res.status(400).json({ status: false, message: "Isi parameter 'merchant'." });
+        if (!merchant) {
+        return res.json({ error: "Isi Parameter Merchant." });
     }
     if (!keyorkut) {
-        return res.status(400).json({ status: false, message: "Isi parameter 'keyorkut'." });
+        return res.json({ error: "Isi Parameter Token menggunakan token kalian." });
     }
-
     try {
         const apiUrl = `https://gateway.okeconnect.com/api/mutasi/qris/${merchant}/${keyorkut}`;
         const response = await axios.get(apiUrl);
         const result = response.data;
-
+                // Check if data exists and get the latest transaction
         const latestTransaction = result.data && result.data.length > 0 ? result.data[0] : null;
-        if (latestTransaction) {
-            res.json({
-                status: true,
-                message: "Berhasil mendapatkan transaksi.",
-                result: latestTransaction,
-            });
+                if (latestTransaction) {
+            res.json(latestTransaction);
         } else {
-            res.json({
-                status: false,
-                message: "Tidak ada transaksi ditemukan.",
-            });
+            res.json({ message: "No transactions found." });
         }
     } catch (error) {
-        res.status(500).json({
-            status: false,
-            message: "Terjadi kesalahan saat mengambil data.",
-            error: error.message,
-        });
+        res.status(500).json({ error: error.message });
     }
 });
 
