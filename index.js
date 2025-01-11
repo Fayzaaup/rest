@@ -65,19 +65,37 @@ app.get('/api/orkut/createpayment', async (req, res) => {
 
 app.get('/api/orkut/cekstatus', async (req, res) => {
     const { merchant, keyorkut } = req.query;
-    const url = `https://api.simplebot.my.id/api/orkut/cekstatus?apikey=&merchant=${merchant}&keyorkut=${keyorkut}`;
+
+    if (!merchant) {
+        return res.status(400).json({ status: false, message: "Isi parameter 'merchant'." });
+    }
+    if (!keyorkut) {
+        return res.status(400).json({ status: false, message: "Isi parameter 'keyorkut'." });
+    }
 
     try {
-        console.log("Mengakses URL:", url);
-        const response = await axios.get(url);
-        console.log("Respons API Eksternal:", response.data);
+        const apiUrl = `https://gateway.okeconnect.com/api/mutasi/qris/${merchant}/${keyorkut}`;
+        const response = await axios.get(apiUrl);
+        const result = response.data;
 
-        res.json({ status: true, creator: "HexaNeuro", result: response.data });
+        const latestTransaction = result.data && result.data.length > 0 ? result.data[0] : null;
+        if (latestTransaction) {
+            res.json({
+                status: true,
+                message: "Berhasil mendapatkan transaksi.",
+                result: latestTransaction,
+            });
+        } else {
+            res.json({
+                status: false,
+                message: "Tidak ada transaksi ditemukan.",
+            });
+        }
     } catch (error) {
-        console.error("Error saat mengakses API:", error.response?.data || error.message);
         res.status(500).json({
             status: false,
-            message: "Terjadi kesalahan saat mengakses API eksternal.",
+            message: "Terjadi kesalahan saat mengambil data.",
+            error: error.message,
         });
     }
 });
