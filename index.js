@@ -199,7 +199,74 @@ app.get("/api/downloader/ytmp4", async (req, res) => {
     }
 });
 
+app.get('/api/ff-stalk', async (req, res) => {
+    const { id } = req.query;
 
+    if (!id) {
+        return res.status(400).json({ status: false, creator: "HexaNeuro", message: "Isi parameter 'id'." });
+    }
+
+    try {
+        const apiUrl = `https://vapis.my.id/api/ff-stalk?id=${id}`;
+        const response = await axios.get(apiUrl);
+        const result = response.data;
+
+        if (result.status) {
+            res.json({
+                status: true,
+                creator: "HexaNeuro",
+                account: {
+                    id: result.data.account.id,
+                    name: result.data.account.name,
+                    level: result.data.account.level,
+                    xp: result.data.account.xp,
+                    region: result.data.account.region,
+                    like: result.data.account.like,
+                    bio: result.data.account.bio,
+                    create_time: result.data.account.create_time,
+                    last_login: result.data.account.last_login,
+                    honor_score: result.data.account.honor_score,
+                    booyah_pass: result.data.account.booyah_pass,
+                    booyah_pass_badge: result.data.account.booyah_pass_badge,
+                    evo_access_badge: result.data.account.evo_access_badge,
+                    equipped_title: result.data.account.equipped_title,
+                    BR_points: result.data.account.BR_points,
+                    CS_points: result.data.account.CS_points
+                },
+                guild: {
+                    name: result.data.guild.name,
+                    id: result.data.guild.id,
+                    level: result.data.guild.level,
+                    member: result.data.guild.member,
+                    capacity: result.data.guild.capacity
+                },
+                pet_info: {
+                    name: result.data.pet_info.name,
+                    level: result.data.pet_info.level,
+                    type: result.data.pet_info.type,
+                    xp: result.data.pet_info.xp
+                },
+                ketua_guild: {
+                    id: result.data.ketua_guild.id,
+                    name: result.data.ketua_guild.name,
+                    level: result.data.ketua_guild.level,
+                    xp: result.data.ketua_guild.xp,
+                    create_time: result.data.ketua_guild.create_time,
+                    last_login: result.data.ketua_guild.last_login,
+                    BP_bagdes: result.data.ketua_guild.BP_bagdes,
+                    BR_points: result.data.ketua_guild.BR_points,
+                    CS_points: result.data.ketua_guild.CS_points,
+                    like: result.data.ketua_guild.like,
+                    equipped_title: result.data.ketua_guild.equipped_title
+                }
+            });
+        } else {
+            res.status(404).json({ status: false, creator: "HexaNeuro", message: "Data tidak ditemukan." });
+        }
+    } catch (error) {
+        res.status(500).json({ status: false, creator: "HexaNeuro", message: "Terjadi kesalahan saat mengambil data." });
+    }
+});
 
 app.get("/api/downloader/spotifys", async (req, res) => {
     try {
