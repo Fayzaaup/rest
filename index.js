@@ -65,56 +65,19 @@ app.get('/api/orkut/createpayment', async (req, res) => {
 
 app.get('/api/orkut/cekstatus', async (req, res) => {
     const { merchant, keyorkut } = req.query;
-
-    // Validasi parameter
-    if (!merchant || !keyorkut) {
-        return res.status(400).json({
-            status: false,
-            creator: "HexaNeuro",
-            message: "Isi parameter 'merchant' dan 'keyorkut' dengan benar."
-        });
-    }
+    const url = `https://api.simplebot.my.id/api/orkut/cekstatus?apikey=&merchant=${merchant}&keyorkut=${keyorkut}`;
 
     try {
-        // Endpoint eksternal
-        const url = `https://api.simplebot.my.id/api/orkut/cekstatus?apikey=&merchant=${merchant}&keyorkut=${keyorkut}`;
-        const response = await fetch(url);
+        console.log("Mengakses URL:", url);
+        const response = await axios.get(url);
+        console.log("Respons API Eksternal:", response.data);
 
-        // Jika ada masalah pada API eksternal
-        if (!response.ok) {
-            throw new Error(`Error dari API eksternal: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-
-        // Struktur respon API
-        if (data.date) {
-            res.json({
-                status: true,
-                creator: "HexaNeuro",
-                result: {
-                    tanggal: data.date,
-                    nominal: data.amount,
-                    jenis: data.type,
-                    qris: data.qris,
-                    nama_brand: data.brand_name,
-                    issuer_reff: data.issuer_reff,
-                    buyer_reff: data.buyer_reff,
-                    saldo: data.balance,
-                }
-            });
-        } else {
-            res.status(500).json({
-                status: false,
-                creator: "HexaNeuro",
-                message: "Respon tidak valid dari API eksternal."
-            });
-        }
+        res.json({ status: true, creator: "HexaNeuro", result: response.data });
     } catch (error) {
+        console.error("Error saat mengakses API:", error.response?.data || error.message);
         res.status(500).json({
             status: false,
-            creator: "HexaNeuro",
-            message: error.message
+            message: "Terjadi kesalahan saat mengakses API eksternal.",
         });
     }
 });
