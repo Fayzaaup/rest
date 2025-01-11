@@ -65,25 +65,49 @@ app.get('/api/orkut/createpayment', async (req, res) => {
 
 app.get('/api/orkut/cekstatus', async (req, res) => {
     const { merchant, keyorkut } = req.query;
-        if (!merchant) {
-        return res.json({ error: "Isi Parameter Merchant." });
+
+    if (!merchant) {
+        return res.status(400).json({ 
+            status: false, 
+            creator: "HexaNeuro", 
+            message: "Isi parameter 'merchant'." 
+        });
     }
     if (!keyorkut) {
-        return res.json({ error: "Isi Parameter Token menggunakan token kalian." });
+        return res.status(400).json({ 
+            status: false, 
+            creator: "HexaNeuro", 
+            message: "Isi parameter 'keyorkut'." 
+        });
     }
+
     try {
         const apiUrl = `https://gateway.okeconnect.com/api/mutasi/qris/${merchant}/${keyorkut}`;
         const response = await axios.get(apiUrl);
         const result = response.data;
-                // Check if data exists and get the latest transaction
+
         const latestTransaction = result.data && result.data.length > 0 ? result.data[0] : null;
-                if (latestTransaction) {
-            res.json(latestTransaction);
+        if (latestTransaction) {
+            res.json({
+                status: true,
+                creator: "HexaNeuro",
+                message: "Berhasil mendapatkan transaksi.",
+                result: latestTransaction,
+            });
         } else {
-            res.json({ message: "No transactions found." });
+            res.json({
+                status: false,
+                creator: "HexaNeuro",
+                message: "Tidak ada transaksi ditemukan.",
+            });
         }
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({
+            status: false,
+            creator: "HexaNeuro",
+            message: "Terjadi kesalahan saat mengambil data.",
+            error: error.message,
+        });
     }
 });
 
