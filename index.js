@@ -82,25 +82,11 @@ app.get('/api/orkut/cekstatus', async (req, res) => {
     }
 
     try {
-        const apiUrl = `https://gateway.okeconnect.com/api/mutasi/qris/${merchant}/${keyorkut}`;
+        const apiUrl = `https://rafaelxd.tech/api/orkut/cekstatus?merchant=${merchant}&keyorkut=${keyorkut}`;
         const response = await axios.get(apiUrl);
-        const result = response.data;
-
-        const latestTransaction = result.data && result.data.length > 0 ? result.data[0] : null;
-        if (latestTransaction) {
-            res.json({
-                status: true,
-                creator: "HexaNeuro",
-                message: "Berhasil mendapatkan transaksi.",
-                result: latestTransaction,
-            });
-        } else {
-            res.json({
-                status: false,
-                creator: "HexaNeuro",
-                message: "Tidak ada transaksi ditemukan.",
-            });
-        }
+        
+        // Langsung return respons dari API eksternal
+        res.json(response.data);
     } catch (error) {
         res.status(500).json({
             status: false,
