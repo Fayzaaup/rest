@@ -52,7 +52,7 @@ app.get('/api/orkut/createpayment', async (req, res) => {
     }
 
     try {
-        const response = await fetch(`https://hexaneuro.apixd.my.id/api/orkut/createpayment?apikey=hafiza&amount=${amount}&codeqr=${codeqr}`);
+        const response = await fetch(`https://rafaelxd.tech/api/orkut/createpayment?&amount=${amount}&codeqr=${codeqr}`);
         if (!response.ok) {
             throw new Error(`Error dari API eksternal: ${response.statusText}`);
         }
